@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ahmedabad to Mumbai Bus Ride</title>
+<meta name="description" content="An animated 10-hour bus journey from Ahmedabad to Mumbai on NH48, with the sky, weather and an original Hindustani soundtrack changing with the time of day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Ahmedabad <span class="arrow">→</span> Mumbai by bus</h1>
+    <p class="sub">534 km down NH48 in about 10 hours. The sky, light and temperature follow the clock and where the bus is.</p>
+  </header>
+
+  <div class="grid">
+    <div class="scene-card">
+      <canvas id="scene" aria-label="Side view of the bus on the highway, with the sky changing over the day"></canvas>
+      <div class="chip"><b id="chipTime">6:00 AM</b><span id="chipPlace">Ahmedabad</span></div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <button class="tapmusic" id="tapMusic" type="button"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6 2.5l8-1.5v9.2a2.3 2.3 0 1 1-1.4-2.1V4.3L7.4 5.3v6.9a2.3 2.3 0 1 1-1.4-2.1z"/></svg>Tap to ride with music</button>
+    </div>
+
+    <section class="controls card" aria-label="Playback">
+      <div class="row">
+        <button class="btn primary" id="play" type="button"></button>
+        <button class="btn" id="restart" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.6"/><path d="M3 2.5v3h3"/></svg>Restart
+        </button>
+        <button class="btn music" id="music" type="button" aria-pressed="false">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6 2.5l8-1.5v9.2a2.3 2.3 0 1 1-1.4-2.1V4.3L7.4 5.3v6.9a2.3 2.3 0 1 1-1.4-2.1z"/></svg><span id="musicLabel">Music off</span>
+        </button>
+        <label class="field" for="dep">Leaves at
+          <select id="dep">
+            <option value="5">5:00 AM</option>
+            <option value="6" selected>6:00 AM</option>
+            <option value="7">7:00 AM</option>
+            <option value="8">8:00 AM</option>
+            <option value="14">2:00 PM</option>
+            <option value="22">10:00 PM (overnight)</option>
+          </select>
+        </label>
+        <span class="spacer"></span>
+        <div class="seg" role="group" aria-label="Playback speed">
+          <button type="button" data-rate="2.5" id="r1">1×</button>
+          <button type="button" data-rate="5" id="r2">2×</button>
+          <button type="button" data-rate="10" id="r4">4×</button>
+          <button type="button" data-rate="20" id="r8">8×</button>
+        </div>
+      </div>
+      <div class="scrub">
+        <input id="scrub" type="range" min="0" max="600" step="1" value="0" aria-label="Journey time">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <div class="scale"><span id="sStart">6:00 AM</span><span id="sMid">11:00 AM</span><span id="sEnd">4:00 PM</span></div>
+      </div>
+      <div class="rate-note" id="rateNote"></div>
+      <div class="rate-note" id="musicNote">An original tune in Hindustani style. The raga follows the clock: Bhairav at dawn, Bhupali by day, Yaman at dusk, Malkauns at night.</div>
+    </section>
+
+    <section class="stats" aria-label="Trip readouts">
+      <div class="card clock">
+        <div class="t" id="clock">6:00<small>AM</small></div>
+        <div class="d" id="clockSub">Day 1 · 0 h 00 m on the road</div>
+        <div class="daybar"><span id="daybar"></span></div>
+      </div>
+      <div class="tiles">
+        <div class="card tile"><div class="k">Where</div><div class="v" id="where">Ahmedabad</div><div class="s" id="whereSub">Gujarat</div></div>
+        <div class="card tile"><div class="k">Covered</div><div class="v num" id="km">0 km</div><div class="s" id="kmSub">534 km to go</div></div>
+        <div class="card tile"><div class="k">Next stop</div><div class="v" id="next">Vadodara</div><div class="s" id="nextSub">ETA</div></div>
+        <div class="card tile"><div class="k">Speed</div><div class="v num" id="speed">0 km/h</div><div class="s" id="speedSub">Waiting to leave</div></div>
+        <div class="card tile"><div class="k">Temperature</div><div class="v num" id="temp">17°C</div><div class="s" id="tempSub">Typical for late November</div></div>
+        <div class="card tile"><div class="k">Sky</div><div class="v" id="sky">Dawn</div><div class="s" id="skySub">Sun below horizon</div></div>
+      </div>
+    </section>
+
+    <aside class="map-card card" aria-label="Route map">
+      <h2>Route on NH48</h2>
+      <svg id="map" role="img" aria-label="Map of the bus route from Ahmedabad to Mumbai along the Gujarat and Maharashtra coast"></svg>
+      <div class="legend">
+        <span><i></i>Covered</span>
+        <span><i class="todo"></i>Still to go</span>
+        <span><i class="dot"></i>Halt or city</span>
+      </div>
+    </aside>
+
+    <section class="log-card card" aria-label="Journey log">
+      <h2>Journey log</h2>
+      <ol id="log"></ol>
+    </section>
+  </div>
+
+  <footer>Halts and timings follow a typical day coach schedule, not a real operator's timetable. The sun is calculated for late November at the bus's position; temperature and haze follow November averages, not a live forecast. The map is simplified and the state border approximate.</footer>
+</main>
+
+<script src="script.js" defer></script>
+</body>
+</html>
