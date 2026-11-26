@@ -1,0 +1,155 @@
+/* India Bus Journey: geographic data (simplified, approximate; for illustration only) */
+window.GEO = (() => {
+  // [name, state, lon, lat, size 1-3, industrial 0/1]
+  const CITIES = [
+    ["Delhi","DL",77.21,28.61,3,1],["Gurugram","HR",77.03,28.46,2,1],["Panipat","HR",76.97,29.39,1,1],["Karnal","HR",76.99,29.69,1,0],["Ambala","HR",76.78,30.38,1,0],["Hisar","HR",75.72,29.15,1,0],["Rohtak","HR",76.61,28.90,1,0],
+    ["Chandigarh","CH",76.78,30.73,2,0],["Ludhiana","PB",75.85,30.90,2,1],["Jalandhar","PB",75.58,31.33,2,0],["Amritsar","PB",74.87,31.63,2,0],["Pathankot","PB",75.65,32.27,1,0],["Bathinda","PB",74.95,30.21,1,1],["Patiala","PB",76.39,30.34,1,0],
+    ["Jammu","JK",74.86,32.73,2,0],["Srinagar","JK",74.80,34.08,2,0],["Leh","LA",77.58,34.15,1,0],
+    ["Shimla","HP",77.17,31.10,1,0],["Manali","HP",77.19,32.24,1,0],["Dharamshala","HP",76.32,32.22,1,0],["Mandi","HP",76.93,31.71,1,0],
+    ["Dehradun","UK",78.03,30.32,2,0],["Rishikesh","UK",78.27,30.09,1,0],["Haridwar","UK",78.16,29.95,1,0],["Nainital","UK",79.46,29.38,1,0],["Haldwani","UK",79.51,29.22,1,0],
+    ["Meerut","UP",77.71,28.98,2,1],["Moradabad","UP",78.77,28.84,1,0],["Bareilly","UP",79.43,28.37,1,0],["Aligarh","UP",78.08,27.88,1,0],["Mathura","UP",77.67,27.49,1,0],["Agra","UP",78.01,27.18,2,0],["Kanpur","UP",80.33,26.45,2,1],["Lucknow","UP",80.95,26.85,3,0],["Prayagraj","UP",81.85,25.44,2,0],["Varanasi","UP",82.97,25.32,2,0],["Gorakhpur","UP",83.37,26.76,1,0],["Ayodhya","UP",82.20,26.80,1,0],["Jhansi","UP",78.57,25.45,1,0],["Etawah","UP",79.02,26.78,1,0],["Firozabad","UP",78.40,27.15,1,1],["Fatehpur","UP",80.81,25.93,1,0],["Mirzapur","UP",82.57,25.15,1,0],["Shahjahanpur","UP",79.90,27.88,1,0],["Sitapur","UP",80.68,27.57,1,0],["Jaunpur","UP",82.69,25.75,1,0],["Rae Bareli","UP",81.24,26.23,1,0],["Banda","UP",80.33,25.48,1,0],["Mainpuri","UP",79.02,27.23,1,0],
+    ["Patna","BR",85.14,25.59,2,0],["Gaya","BR",85.00,24.79,1,0],["Bhagalpur","BR",86.98,25.24,1,0],["Muzaffarpur","BR",85.39,26.12,1,0],["Darbhanga","BR",85.90,26.15,1,0],["Purnia","BR",87.47,25.78,1,0],
+    ["Jaipur","RJ",75.79,26.91,3,0],["Ajmer","RJ",74.64,26.45,1,0],["Jodhpur","RJ",73.02,26.24,2,0],["Bikaner","RJ",73.31,28.02,1,0],["Jaisalmer","RJ",70.91,26.91,1,0],["Barmer","RJ",71.39,25.75,1,0],["Udaipur","RJ",73.71,24.59,2,0],["Kota","RJ",75.86,25.18,2,1],["Bhilwara","RJ",74.63,25.35,1,1],["Mount Abu","RJ",72.71,24.59,1,0],["Alwar","RJ",76.60,27.55,1,0],["Sikar","RJ",75.14,27.61,1,0],["Chittorgarh","RJ",74.63,24.88,1,0],
+    ["Ahmedabad","GJ",72.57,23.02,3,1],["Gandhinagar","GJ",72.64,23.22,1,0],["Vadodara","GJ",73.18,22.31,2,1],["Surat","GJ",72.83,21.17,3,1],["Rajkot","GJ",70.80,22.30,2,1],["Jamnagar","GJ",70.06,22.47,1,1],["Bhavnagar","GJ",72.15,21.76,1,0],["Bhuj","GJ",69.67,23.25,1,0],["Dwarka","GJ",68.97,22.24,1,0],["Somnath","GJ",70.40,20.89,1,0],["Junagadh","GJ",70.46,21.52,1,0],["Bharuch","GJ",72.99,21.70,1,1],["Vapi","GJ",72.90,20.37,1,1],["Palanpur","GJ",72.43,24.17,1,0],["Mehsana","GJ",72.39,23.60,1,0],["Nadiad","GJ",72.86,22.69,1,0],
+    ["Mumbai","MH",72.88,19.08,3,1],["Thane","MH",72.98,19.20,2,1],["Pune","MH",73.86,18.52,3,1],["Lonavala","MH",73.41,18.75,1,0],["Nashik","MH",73.79,19.99,2,1],["Aurangabad","MH",75.34,19.88,2,1],["Nagpur","MH",79.09,21.15,3,0],["Kolhapur","MH",74.24,16.70,2,0],["Solapur","MH",75.91,17.66,2,0],["Satara","MH",74.00,17.68,1,0],["Ratnagiri","MH",73.30,16.99,1,0],["Akola","MH",77.00,20.70,1,0],["Amravati","MH",77.75,20.93,1,0],["Jalgaon","MH",75.56,21.00,1,0],["Nanded","MH",77.30,19.15,1,0],["Latur","MH",76.57,18.41,1,0],["Ahmednagar","MH",74.74,19.09,1,0],["Chandrapur","MH",79.30,19.96,1,1],["Dhule","MH",74.77,20.90,1,0],["Chiplun","MH",73.52,17.53,1,0],
+    ["Panaji","GA",73.83,15.49,1,0],["Margao","GA",73.96,15.27,1,0],
+    ["Bengaluru","KA",77.59,12.97,3,1],["Mysuru","KA",76.64,12.30,2,0],["Mangaluru","KA",74.86,12.91,2,1],["Hubballi","KA",75.12,15.36,2,0],["Belagavi","KA",74.50,15.85,1,0],["Ballari","KA",76.92,15.14,1,1],["Davanagere","KA",75.92,14.46,1,0],["Shivamogga","KA",75.57,13.93,1,0],["Udupi","KA",74.75,13.34,1,0],["Karwar","KA",74.13,14.81,1,0],["Hassan","KA",76.10,13.00,1,0],["Kalaburagi","KA",76.83,17.33,1,0],["Vijayapura","KA",75.71,16.83,1,0],["Hosapete","KA",76.39,15.27,1,1],["Chitradurga","KA",76.40,14.23,1,0],["Tumakuru","KA",77.10,13.34,1,0],["Madikeri","KA",75.74,12.42,1,0],
+    ["Thiruvananthapuram","KL",76.94,8.52,2,0],["Kochi","KL",76.27,9.93,2,1],["Kozhikode","KL",75.78,11.26,2,0],["Thrissur","KL",76.21,10.53,1,0],["Kannur","KL",75.37,11.87,1,0],["Alappuzha","KL",76.33,9.50,1,0],["Kollam","KL",76.60,8.89,1,0],["Munnar","KL",77.06,10.09,1,0],["Palakkad","KL",76.65,10.78,1,0],
+    ["Chennai","TN",80.27,13.08,3,1],["Coimbatore","TN",76.96,11.02,2,1],["Madurai","TN",78.12,9.93,2,0],["Tiruchirappalli","TN",78.70,10.80,2,1],["Salem","TN",78.15,11.66,2,1],["Erode","TN",77.72,11.34,1,0],["Vellore","TN",79.13,12.92,1,0],["Thanjavur","TN",79.14,10.79,1,0],["Tirunelveli","TN",77.70,8.71,1,0],["Kanyakumari","TN",77.54,8.08,1,0],["Ooty","TN",76.70,11.41,1,0],["Kodaikanal","TN",77.49,10.24,1,0],["Rameswaram","TN",79.31,9.29,1,0],["Hosur","TN",77.83,12.74,1,1],["Krishnagiri","TN",78.21,12.52,1,0],["Tiruppur","TN",77.34,11.11,1,1],["Thoothukudi","TN",78.13,8.76,1,1],["Puducherry","PY",79.81,11.94,1,0],
+    ["Hyderabad","TS",78.49,17.39,3,1],["Warangal","TS",79.59,17.97,1,0],["Karimnagar","TS",79.13,18.44,1,0],["Nizamabad","TS",78.09,18.67,1,0],["Adilabad","TS",78.53,19.67,1,0],["Khammam","TS",80.15,17.25,1,0],
+    ["Vijayawada","AP",80.65,16.51,2,0],["Visakhapatnam","AP",83.22,17.69,3,1],["Tirupati","AP",79.42,13.63,1,0],["Nellore","AP",79.99,14.44,1,0],["Guntur","AP",80.44,16.31,1,0],["Kurnool","AP",78.04,15.83,1,0],["Anantapur","AP",77.60,14.68,1,0],["Rajahmundry","AP",81.80,17.00,1,0],["Kakinada","AP",82.24,16.99,1,1],["Ongole","AP",80.05,15.50,1,0],["Srikakulam","AP",83.90,18.30,1,0],["Kadapa","AP",78.82,14.47,1,0],
+    ["Bhubaneswar","OD",85.82,20.30,2,0],["Cuttack","OD",85.88,20.46,1,0],["Puri","OD",85.83,19.81,1,0],["Rourkela","OD",84.85,22.26,1,1],["Sambalpur","OD",83.97,21.47,1,0],["Berhampur","OD",84.79,19.31,1,0],["Balasore","OD",86.93,21.49,1,0],["Angul","OD",85.10,20.84,1,1],["Koraput","OD",82.71,18.81,1,0],
+    ["Kolkata","WB",88.36,22.57,3,1],["Durgapur","WB",87.32,23.52,1,1],["Asansol","WB",86.98,23.68,1,1],["Siliguri","WB",88.43,26.73,2,0],["Darjeeling","WB",88.26,27.04,1,0],["Kharagpur","WB",87.32,22.35,1,0],["Malda","WB",88.14,25.00,1,0],["Digha","WB",87.51,21.63,1,0],["Bardhaman","WB",87.86,23.23,1,0],["Krishnanagar","WB",88.50,23.40,1,0],
+    ["Ranchi","JH",85.31,23.34,2,0],["Jamshedpur","JH",86.20,22.80,2,1],["Dhanbad","JH",86.43,23.80,1,1],["Bokaro","JH",86.15,23.67,1,1],["Hazaribagh","JH",85.36,23.99,1,0],
+    ["Raipur","CG",81.63,21.25,2,0],["Bhilai","CG",81.38,21.21,1,1],["Bilaspur","CG",82.15,22.08,1,0],["Jagdalpur","CG",82.03,19.07,1,0],["Korba","CG",82.75,22.35,1,1],["Ambikapur","CG",83.19,23.12,1,0],
+    ["Bhopal","MP",77.41,23.26,3,0],["Indore","MP",75.86,22.72,3,1],["Jabalpur","MP",79.94,23.18,2,0],["Gwalior","MP",78.18,26.22,2,0],["Ujjain","MP",75.78,23.18,1,0],["Sagar","MP",78.74,23.84,1,0],["Satna","MP",80.83,24.58,1,1],["Rewa","MP",81.30,24.53,1,0],["Khajuraho","MP",79.92,24.85,1,0],["Pachmarhi","MP",78.43,22.47,1,0],["Itarsi","MP",77.76,22.61,1,0],["Khandwa","MP",76.35,21.82,1,0],["Ratlam","MP",75.04,23.33,1,0],["Mandla","MP",80.37,22.60,1,0],["Katni","MP",80.40,23.83,1,0],["Shivpuri","MP",77.66,25.42,1,0],["Seoni","MP",79.54,22.09,1,0],["Betul","MP",77.90,21.90,1,0],
+    ["Guwahati","AS",91.74,26.14,2,0],["Dibrugarh","AS",94.91,27.47,1,0],["Jorhat","AS",94.20,26.75,1,0],["Tezpur","AS",92.80,26.63,1,0],["Silchar","AS",92.80,24.83,1,0],["Nagaon","AS",92.68,26.35,1,0],["Bongaigaon","AS",90.56,26.48,1,0],
+    ["Shillong","ML",91.89,25.58,1,0],["Agartala","TR",91.28,23.83,1,0],["Imphal","MN",93.94,24.82,1,0],["Kohima","NL",94.11,25.67,1,0],["Dimapur","NL",93.73,25.90,1,0],["Aizawl","MZ",92.72,23.73,1,0],["Itanagar","AR",93.62,27.08,1,0],["Gangtok","SK",88.61,27.33,1,0],["Alipurduar","WB",89.53,26.49,1,0],["Cooch Behar","WB",89.45,26.32,1,0]
+  ];
+  const STATES = {DL:"Delhi",HR:"Haryana",CH:"Chandigarh",PB:"Punjab",JK:"Jammu & Kashmir",LA:"Ladakh",HP:"Himachal Pradesh",UK:"Uttarakhand",UP:"Uttar Pradesh",BR:"Bihar",RJ:"Rajasthan",GJ:"Gujarat",MH:"Maharashtra",GA:"Goa",KA:"Karnataka",KL:"Kerala",TN:"Tamil Nadu",PY:"Puducherry",TS:"Telangana",AP:"Andhra Pradesh",OD:"Odisha",WB:"West Bengal",JH:"Jharkhand",CG:"Chhattisgarh",MP:"Madhya Pradesh",AS:"Assam",ML:"Meghalaya",TR:"Tripura",MN:"Manipur",NL:"Nagaland",MZ:"Mizoram",AR:"Arunachal Pradesh",SK:"Sikkim"};
+  const ALIASES = {bombay:"Mumbai",bangalore:"Bengaluru",calcutta:"Kolkata",madras:"Chennai",gurgaon:"Gurugram",allahabad:"Prayagraj",trivandrum:"Thiruvananthapuram",cochin:"Kochi",ernakulam:"Kochi",mysore:"Mysuru",mangalore:"Mangaluru",baroda:"Vadodara",poona:"Pune",benares:"Varanasi",banaras:"Varanasi",kashi:"Varanasi",vizag:"Visakhapatnam",calicut:"Kozhikode",pondicherry:"Puducherry",pondy:"Puducherry",trichy:"Tiruchirappalli",hubli:"Hubballi",belgaum:"Belagavi",gulbarga:"Kalaburagi",bijapur:"Vijayapura",shimoga:"Shivamogga",tuticorin:"Thoothukudi",ooty:"Ooty",udhagamandalam:"Ooty",goa:"Panaji",panjim:"Panaji",new_delhi:"Delhi","new delhi":"Delhi",cuttack:"Cuttack",orissa:"Bhubaneswar",secunderabad:"Hyderabad",cyberabad:"Hyderabad",navi_mumbai:"Thane","navi mumbai":"Thane",noida:"Delhi",ghaziabad:"Delhi",faridabad:"Delhi",kanyakumari:"Kanyakumari",cape_comorin:"Kanyakumari",hampi:"Hosapete",coorg:"Madikeri",kodagu:"Madikeri",alleppey:"Alappuzha",quilon:"Kollam",trichur:"Thrissur",cannanore:"Kannur",palghat:"Palakkad",rajahmundry:"Rajahmundry",rajamahendravaram:"Rajahmundry",prayag:"Prayagraj",faizabad:"Ayodhya",dharamsala:"Dharamshala",mcleodganj:"Dharamshala",mussoorie:"Dehradun",kasauli:"Shimla",somnath:"Somnath",veraval:"Somnath",aurangabad:"Aurangabad",sambhajinagar:"Aurangabad","chhatrapati sambhajinagar":"Aurangabad",gangtok:"Gangtok",darjeeling:"Darjeeling",kalimpong:"Darjeeling",bodhgaya:"Gaya",jamshedpur:"Jamshedpur",tatanagar:"Jamshedpur"};
+
+  // Terrain zones: polygons in [lon, lat]
+  const ZONES = [
+    { id:"himalaya", kind:"mountain", name:"Himalaya", snow:true, poly:[[73.8,33.2],[74.5,32.4],[75.5,32.05],[76.4,31.35],[77.35,30.6],[77.9,30.25],[78.6,29.95],[79.6,29.25],[80.3,28.9],[80.9,30.3],[79.3,31.2],[78.2,32.6],[77.0,34.5],[75.5,35.0],[74.0,34.7]] },
+    { id:"ehimalaya", kind:"mountain", name:"Eastern Himalaya", snow:true, poly:[[88.0,26.82],[88.9,26.82],[89.5,26.85],[92.1,26.95],[93.3,27.0],[94.4,27.5],[95.6,27.9],[96.2,28.4],[95.0,29.3],[92.0,28.3],[89.0,28.2],[88.0,28.0]] },
+    { id:"nehills", kind:"hills", name:"North-East hills", poly:[[93.2,25.4],[93.6,26.2],[94.5,26.6],[95.2,26.7],[95.4,26.2],[94.8,25.2],[94.6,23.6],[93.8,22.0],[92.9,22.0],[92.6,23.0],[92.6,24.2],[93.0,24.9]] },
+    { id:"meghalaya", kind:"hills", name:"Meghalaya plateau", poly:[[89.9,25.25],[92.4,25.2],[92.8,25.6],[92.4,26.0],[90.2,25.95]] },
+    { id:"wghats", kind:"hills", name:"Western Ghats", poly:[[73.45,21.0],[73.4,19.2],[73.45,17.8],[73.75,16.2],[74.25,14.6],[74.95,13.1],[75.55,11.9],[76.2,10.9],[76.75,9.6],[77.1,8.45],[77.55,8.5],[77.45,9.8],[77.25,10.4],[77.0,11.0],[76.95,11.6],[76.4,12.2],[75.9,12.9],[75.15,14.3],[74.55,15.9],[74.15,17.5],[73.95,19.2],[74.05,20.6]] },
+    { id:"eghats", kind:"hills", name:"Eastern Ghats", poly:[[84.7,20.4],[84.4,19.2],[83.1,18.2],[82.0,17.6],[81.3,16.9],[80.6,15.7],[79.6,14.6],[79.0,13.4],[78.5,12.5],[78.0,11.7],[78.5,11.5],[79.1,12.4],[79.7,13.4],[80.1,14.6],[81.2,16.2],[82.3,17.2],[83.6,18.4],[84.6,19.5],[85.1,20.5],[84.3,21.0],[83.3,20.6]] },
+    { id:"aravalli", kind:"hills", name:"Aravalli Range", poly:[[72.4,24.2],[72.9,24.2],[73.9,25.4],[74.9,26.4],[76.0,27.3],[77.1,28.3],[76.9,28.6],[75.7,27.7],[74.4,26.7],[73.5,25.7],[72.6,24.8]] },
+    { id:"satpura", kind:"hills", name:"Satpura–Vindhya hills", poly:[[74.9,21.4],[76.8,21.55],[78.6,21.75],[80.4,21.95],[81.6,22.35],[81.6,22.9],[80.2,22.7],[78.4,22.6],[76.6,22.15],[74.9,21.95]] },
+    { id:"thar", kind:"desert", name:"Thar Desert", poly:[[69.6,24.6],[71.0,24.45],[72.1,25.25],[73.3,26.3],[74.0,27.4],[74.3,28.6],[73.9,29.7],[72.6,30.0],[71.2,28.9],[70.0,27.9],[69.5,26.8]] },
+    { id:"rann", kind:"saltflat", name:"Rann of Kutch", poly:[[68.9,23.75],[70.3,23.7],[71.6,23.55],[71.7,24.2],[70.3,24.35],[69.0,24.3]] },
+    { id:"chotanagpur", kind:"forest", name:"Chota Nagpur plateau", poly:[[83.0,22.2],[85.0,21.9],[86.6,22.3],[87.0,23.2],[86.7,24.4],[85.2,24.6],[83.6,24.2],[82.9,23.3]] },
+    { id:"bastar", kind:"forest", name:"Bastar forests", poly:[[80.4,18.0],[82.6,18.0],[82.9,19.4],[82.3,20.6],[81.0,20.6],[80.4,19.4]] },
+    { id:"kanha", kind:"forest", name:"Central Indian forests", poly:[[79.0,21.9],[81.2,21.9],[81.3,22.8],[79.2,22.8]] },
+    { id:"terai", kind:"forest", name:"Terai forests", poly:[[78.3,29.55],[79.3,29.1],[80.1,28.65],[80.3,28.95],[79.4,29.35],[78.5,29.85]] }
+  ];
+  // Coastline from Kutch round the peninsula to the Sundarbans (lon, lat)
+  const COAST = [[68.2,23.6],[68.7,23.0],[69.05,22.4],[68.97,22.24],[69.6,21.64],[70.37,20.9],[70.98,20.71],[71.37,20.87],[71.95,21.18],[72.18,21.42],[72.27,21.62],[72.3,21.98],[72.47,22.28],[72.62,22.32],[72.6,22.02],[72.55,21.7],[72.66,21.42],[72.62,21.1],[72.78,20.85],[72.85,20.48],[72.74,20.2],[72.7,19.8],[72.79,19.33],[72.8,18.95],[72.87,18.6],[73.05,17.9],[73.3,16.99],[73.45,16.06],[73.8,15.4],[74.1,14.8],[74.55,13.97],[74.83,12.87],[74.98,12.5],[75.37,11.87],[75.77,11.25],[76.0,10.6],[76.25,9.95],[76.32,9.49],[76.6,8.88],[76.94,8.5],[77.54,8.08],[78.15,8.8],[78.6,9.2],[79.3,9.28],[79.1,9.6],[79.3,10.25],[79.85,10.3],[79.85,10.77],[79.83,11.93],[80.29,13.08],[80.32,13.6],[80.15,14.4],[80.05,15.5],[80.6,15.85],[81.2,16.17],[82.3,16.5],[82.25,16.95],[83.3,17.7],[84.0,18.2],[84.9,19.27],[85.4,19.7],[85.83,19.8],[86.67,20.27],[86.95,20.8],[87.0,21.4],[87.5,21.63],[88.1,21.65],[88.9,21.6],[89.1,21.7]];
+  const SEA = COAST.concat([[89.1,5.0],[66.0,5.0],[66.0,23.6]]);
+  // Neighbouring countries: roads in this simplified model must not cross them
+  const NOGO = [
+    { name:"Bangladesh", poly:[[89.1,21.7],[89.0,22.9],[88.6,23.6],[88.1,24.4],[88.4,25.2],[88.5,26.4],[89.0,26.3],[89.8,26.0],[89.9,25.3],[91.0,25.2],[92.2,25.0],[92.4,24.2],[91.9,24.15],[91.3,24.1],[91.1,23.6],[91.2,23.0],[91.6,22.95],[91.9,23.3],[92.3,22.4],[92.6,21.3],[92.3,20.7],[91.9,21.5],[91.0,22.6],[90.0,21.8]] },
+    { name:"Nepal", poly:[[80.06,28.9],[81.0,28.3],[82.0,27.9],[83.3,27.35],[84.1,27.4],[84.6,27.0],[85.2,26.85],[86.0,26.6],[87.0,26.4],[88.1,26.4],[88.2,27.9],[86.9,28.0],[85.0,28.8],[83.0,29.4],[81.5,30.4],[80.2,29.9]] },
+    { name:"Bhutan", poly:[[88.75,26.85],[92.1,26.85],[92.1,28.2],[88.9,28.2]] },
+    { name:"Sri Lanka", poly:[[79.85,9.8],[80.25,9.8],[81.9,7.5],[81.8,6.2],[80.6,5.95],[79.85,6.8],[79.8,8.2]] }
+  ];
+  const RIVERS = {
+    "Ganga":[[78.3,30.1],[78.16,29.95],[78.6,29.3],[79.0,28.5],[79.9,27.4],[80.35,26.5],[81.0,26.0],[81.88,25.42],[82.6,25.2],[83.0,25.3],[83.9,25.6],[84.7,25.65],[85.15,25.62],[86.0,25.4],[86.98,25.28],[87.6,25.2],[88.0,24.8]],
+    "Hooghly":[[88.0,24.8],[88.2,24.0],[88.4,23.3],[88.35,22.57],[88.1,21.9]],
+    "Yamuna":[[77.6,31.0],[77.6,30.4],[77.2,29.4],[77.25,28.6],[77.6,27.6],[78.0,27.18],[78.8,26.8],[79.6,26.3],[80.8,25.6],[81.88,25.42]],
+    "Brahmaputra":[[95.4,27.8],[94.9,27.5],[94.2,26.9],[93.0,26.65],[92.8,26.6],[91.74,26.18],[90.6,26.2],[89.85,25.9]],
+    "Sutlej":[[77.1,31.55],[76.43,31.41],[76.55,31.1],[76.4,30.98],[75.85,31.0],[75.35,31.08],[74.97,31.16],[74.6,30.98],[74.05,30.45]],
+    "Beas":[[77.19,32.24],[77.0,31.75],[76.6,31.98],[76.0,31.97],[75.6,31.62],[75.3,31.4],[74.97,31.16]],
+    "Ravi":[[76.3,32.75],[75.73,32.44],[75.38,32.2],[74.9,31.9],[74.6,31.75]],
+    "Chenab":[[75.8,33.2],[75.0,33.0],[74.6,32.85],[74.2,32.75]],
+    "Jhelum":[[75.3,33.8],[74.8,34.08],[74.3,34.2],[73.8,34.1]],
+    "Indus":[[78.4,33.6],[77.58,34.1],[76.6,34.6],[75.6,35.2]],
+    "Chambal":[[75.6,22.6],[75.7,23.6],[75.6,24.6],[75.86,25.18],[76.5,25.9],[77.5,26.5],[78.5,26.6],[79.1,26.45]],
+    "Betwa":[[77.6,22.9],[78.0,24.0],[78.6,25.2],[79.8,25.9]],
+    "Son":[[82.0,22.7],[81.6,23.8],[82.0,24.4],[83.0,24.6],[84.0,25.0],[84.9,25.7]],
+    "Ghaghara":[[81.2,28.4],[81.6,27.5],[82.5,26.8],[83.8,26.2],[84.7,25.7]],
+    "Gomti":[[80.2,28.3],[80.95,26.85],[81.9,26.0],[83.1,25.5]],
+    "Gandak":[[83.9,27.4],[84.6,26.6],[85.2,25.7]],
+    "Kosi":[[86.9,26.5],[87.0,25.9],[87.2,25.4]],
+    "Narmada":[[81.6,22.7],[80.5,23.0],[79.9,23.1],[78.5,22.8],[77.7,22.65],[76.6,22.25],[75.5,22.15],[74.5,22.0],[73.6,21.85],[73.0,21.7],[72.62,21.6]],
+    "Tapi":[[78.2,21.6],[77.0,21.2],[75.6,21.1],[74.6,21.2],[73.8,21.25],[73.3,21.25],[72.95,21.22],[72.63,21.12]],
+    "Mahi":[[74.8,22.6],[74.5,23.3],[73.9,23.4],[73.3,22.7],[73.05,22.45],[72.66,22.24]],
+    "Sabarmati":[[73.3,24.4],[72.8,23.6],[72.58,23.02],[72.45,22.4]],
+    "Godavari":[[73.6,19.95],[74.6,19.6],[75.8,19.2],[77.3,19.15],[78.6,18.9],[79.9,18.7],[80.6,18.0],[81.3,17.4],[81.78,17.0],[82.2,16.6]],
+    "Krishna":[[73.7,17.9],[74.4,17.2],[75.0,16.6],[76.0,16.3],[77.5,16.2],[78.3,16.1],[79.5,16.7],[80.62,16.5],[81.0,16.0]],
+    "Tungabhadra":[[75.5,13.9],[75.9,14.6],[76.4,15.3],[77.4,15.9],[78.05,15.85]],
+    "Kaveri":[[75.6,12.4],[76.3,12.4],[76.7,12.4],[77.2,12.2],[77.75,11.9],[78.1,11.2],[78.7,10.85],[79.3,10.9],[79.85,11.15]],
+    "Mahanadi":[[81.9,20.4],[82.2,21.3],[83.3,21.8],[83.97,21.47],[84.8,20.8],[85.88,20.46],[86.4,20.3],[86.7,20.25]],
+    "Damodar":[[85.0,23.7],[86.4,23.6],[87.3,23.4],[88.0,22.8],[88.1,22.2]],
+    "Pennar":[[77.6,14.1],[78.6,14.6],[79.4,14.6],[80.15,14.55]],
+    "Brahmani":[[84.8,22.3],[85.2,21.3],[86.1,20.9],[86.9,20.7]],
+    "Teesta":[[88.5,27.4],[88.45,26.9],[88.7,26.4],[89.0,26.1]],
+    "Periyar":[[77.1,9.6],[76.6,10.1],[76.2,10.2]],
+    "Barak":[[93.6,24.8],[92.8,24.83],[92.3,24.85]]
+  };
+
+  // Major national-highway corridors (city chains); routes prefer these links
+  const HIGHWAYS = [
+    ["NH44","Srinagar,Jammu,Pathankot,Jalandhar,Ludhiana,Ambala,Karnal,Panipat,Delhi,Mathura,Agra,Gwalior,Jhansi,Sagar,Seoni,Nagpur,Adilabad,Nizamabad,Hyderabad,Kurnool,Anantapur,Bengaluru,Hosur,Krishnagiri,Salem,Madurai,Tirunelveli,Kanyakumari"],
+    ["NH48","Delhi,Gurugram,Alwar,Jaipur,Ajmer,Bhilwara,Chittorgarh,Udaipur,Ahmedabad,Nadiad,Vadodara,Bharuch,Surat,Vapi,Mumbai,Lonavala,Pune,Satara,Kolhapur,Belagavi,Hubballi,Davanagere,Chitradurga,Tumakuru,Bengaluru,Krishnagiri,Vellore,Chennai"],
+    ["NH19","Delhi,Mathura,Agra,Firozabad,Etawah,Kanpur,Fatehpur,Prayagraj,Varanasi,Gaya,Dhanbad,Asansol,Durgapur,Bardhaman,Kolkata"],
+    ["NH16","Kolkata,Kharagpur,Balasore,Cuttack,Bhubaneswar,Berhampur,Srikakulam,Visakhapatnam,Rajahmundry,Vijayawada,Guntur,Ongole,Nellore,Chennai"],
+    ["NH27","Udaipur,Chittorgarh,Kota,Shivpuri,Jhansi,Kanpur,Lucknow,Ayodhya,Gorakhpur,Muzaffarpur,Darbhanga,Purnia,Siliguri,Cooch Behar,Bongaigaon,Guwahati,Nagaon,Silchar"],
+    ["NH66","Mumbai,Chiplun,Ratnagiri,Panaji,Margao,Karwar,Udupi,Mangaluru,Kannur,Kozhikode,Thrissur,Kochi,Alappuzha,Kollam,Thiruvananthapuram,Kanyakumari"],
+    ["NH53","Surat,Dhule,Jalgaon,Akola,Amravati,Nagpur,Bhilai,Raipur,Sambalpur,Angul,Cuttack"],
+    ["NH49","Raipur,Bilaspur,Korba,Rourkela,Jamshedpur,Kharagpur"],
+    ["NH9","Delhi,Rohtak,Hisar,Bathinda"],
+    ["NH5","Chandigarh,Shimla"],
+    ["NH3","Chandigarh,Mandi,Manali,Leh"],
+    ["NH1","Srinagar,Leh"],
+    ["NH154","Pathankot,Dharamshala,Mandi"],
+    ["NH62","Ajmer,Jodhpur,Jaisalmer"],
+    ["NH11","Jaipur,Sikar,Bikaner,Jaisalmer"],
+    ["NH25","Jodhpur,Barmer"],
+    ["NH27W","Bhuj,Mehsana,Ahmedabad,Rajkot,Junagadh,Somnath"],
+    ["NH51","Jamnagar,Rajkot,Dwarka"],
+    ["NH52","Indore,Dhule,Ahmednagar,Solapur,Kalaburagi"],
+    ["NH47","Ahmedabad,Vadodara,Ratlam,Indore,Bhopal,Itarsi,Betul,Nagpur"],
+    ["NH45","Bhopal,Sagar,Jabalpur,Katni,Satna,Rewa,Prayagraj"],
+    ["NH34","Jabalpur,Mandla,Bilaspur"],
+    ["NH30","Raipur,Jagdalpur,Koraput,Visakhapatnam"],
+    ["NH65","Mumbai,Pune,Solapur,Hyderabad,Khammam,Vijayawada"],
+    ["NH163","Hyderabad,Warangal"],
+    ["NH61","Pune,Ahmednagar,Aurangabad,Jalgaon"],
+    ["NH160","Mumbai,Thane,Nashik,Dhule"],
+    ["NH752","Nashik,Aurangabad,Nanded"],
+    ["NH544","Salem,Erode,Tiruppur,Coimbatore,Palakkad,Thrissur"],
+    ["NH38","Chennai,Puducherry,Thanjavur,Tiruchirappalli,Madurai"],
+    ["NH87","Madurai,Rameswaram"],
+    ["NH75","Bengaluru,Hassan,Mangaluru"],
+    ["NH275","Bengaluru,Mysuru,Madikeri"],
+    ["NH181","Mysuru,Ooty,Coimbatore"],
+    ["NH766","Mysuru,Kozhikode"],
+    ["NH85","Kochi,Munnar"],
+    ["NH183","Kodaikanal,Madurai"],
+    ["NH40","Kurnool,Kadapa,Tirupati,Chennai"],
+    ["NH4","Tirupati,Vellore"],
+    ["NH69","Hubballi,Karwar"],
+    ["NH50","Hosapete,Ballari,Kurnool"],
+    ["NH13","Shivamogga,Udupi"],
+    ["NH33","Patna,Gaya,Ranchi,Jamshedpur"],
+    ["NH20","Patna,Muzaffarpur"],
+    ["NH31","Patna,Bhagalpur,Purnia"],
+    ["NH43","Ranchi,Rourkela"],
+    ["NH10","Siliguri,Gangtok"],
+    ["NH110","Siliguri,Darjeeling"],
+    ["NH6","Guwahati,Shillong,Silchar,Aizawl"],
+    ["NH29","Nagaon,Dimapur,Kohima,Imphal"],
+    ["NH715","Nagaon,Tezpur,Itanagar"],
+    ["NH715E","Nagaon,Jorhat,Dibrugarh"],
+    ["NH8","Silchar,Agartala"],
+    ["NH7","Dehradun,Haridwar,Meerut,Delhi"],
+    ["NH109","Haldwani,Nainital"],
+    ["NH9E","Delhi,Moradabad,Bareilly,Shahjahanpur,Sitapur,Lucknow"],
+    ["NH3E","Agra,Gwalior,Shivpuri,Indore"]
+  ];
+  return { CITIES, STATES, ALIASES, ZONES, COAST, SEA, NOGO, RIVERS, HIGHWAYS };
+})();

@@ -1,24 +1,26 @@
-# Ahmedabad → Mumbai Bus Ride
+# India Bus Journey
 
-An animated 534 km bus journey down NH48 in about 10 hours. The sky, light, mist and temperature change with the clock and the bus's position, and an original Hindustani-style soundtrack follows the time of day (Bhairav at dawn, Bhupali by day, Yaman at dusk, Malkauns at night).
+Type any two Indian cities and watch an animated bus journey between them:
+
+- **Realistic routes** along national-highway corridors (NH44, NH48, NH19, NH16, NH27, NH66 and more) across a network of ~230 cities, avoiding the sea and neighbouring countries.
+- **Scenery by terrain**: Himalaya with snow, Western/Eastern Ghats, Aravalli, Thar desert with camels, Rann of Kutch, coast with palms and boats, forests, farmland (crop changes with state and season), cities and industrial belts with chimneys.
+- **River crossings** with bridges (Ganga, Yamuna, Narmada, Godavari, Krishna, Kaveri, Brahmaputra and ~25 more).
+- **Sky, weather and temperature** from the real sun position for your date and departure time, monsoon rain, winter fog in the north, cold mountain air.
+- **Regional music**, synthesised live (no audio files): Punjabi dhol, Rajasthani folk, Gujarati garba, Marathi lavani, Carnatic, Bengali bhatiyali, North-East bamboo flute, Pahadi, and Hindustani ragas that follow the clock.
+- **Infographics**: distance, time, states, terrain mix, route profile, river list, journey log and a map.
 
 ## Files
-- `index.html`: page structure
-- `style.css`: all styling
-- `script.js`: animation, map, readouts and the synthesised music (no libraries, no audio files)
-
-## Run it locally
-Open `index.html` in a browser. That's it.
+`index.html`, `style.css`, `data.js` (cities, highways, terrain zones, rivers, coastline), `app.js` (routing, scene, music, charts). No libraries, no API keys.
 
 ## Publish on GitHub Pages
-1. Create a new public repository on GitHub, for example `bus-ride`.
-2. Upload `index.html`, `style.css`, `script.js` and this README to the root of the repository (Add file → Upload files → Commit).
-3. Go to **Settings → Pages**.
-4. Under **Build and deployment**, set **Source** to *Deploy from a branch*, pick the `main` branch and the `/ (root)` folder, then **Save**.
-5. After a minute or two the site is live at `https://<your-username>.github.io/bus-ride/`.
+1. Create a public repository (e.g. `india-bus-journey`) and upload all files to the root.
+2. Settings → Pages → Deploy from a branch → `main` / `(root)` → Save.
+3. Live at `https://<username>.github.io/india-bus-journey/` in a minute or two.
 
-To put it on your existing site instead (for example `anujiitgn.github.io`), copy the three files into a folder such as `bus-ride/` in that repository; it will be live at `https://anujiitgn.github.io/bus-ride/`.
+Or drop the files into a folder of your existing `username.github.io` repository.
+
+## Add a city
+Append a line to `CITIES` in `data.js`: `["Name","STATE_CODE",lon,lat,size(1-3),industrial(0/1)]`. To make routes prefer a road, add it to `HIGHWAYS` as a comma-separated city chain.
 
 ## Notes
-- Music starts only after a tap (browsers block sound until the visitor interacts).
-- Halts, timings and weather are a typical schedule and late-November averages, not a real timetable or live forecast. The map is simplified.
+Distances, terrain, crops, weather and temperatures are simplified sketches, not navigation or forecasts. Music starts after a tap because browsers block autoplaying sound.
